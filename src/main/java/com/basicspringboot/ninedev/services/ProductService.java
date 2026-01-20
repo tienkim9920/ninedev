@@ -4,6 +4,8 @@ import com.basicspringboot.ninedev.dto.ProductDto;
 import com.basicspringboot.ninedev.dto.ProductMapper;
 import com.basicspringboot.ninedev.dto.ProductRequestDto;
 import com.basicspringboot.ninedev.dto.ProductResponseDto;
+import com.basicspringboot.ninedev.entites.ProductEntity;
+import com.basicspringboot.ninedev.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +16,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    private final ProductRepository productRepository;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
     private static final List<ProductDto> products = new ArrayList<>(Arrays.asList(
             new ProductDto(1, "Laptop Asus", 100000, "Laptop gaming"),
             new ProductDto(2, "Laptop HP", 200000, "Laptop van phong"),
@@ -21,6 +29,7 @@ public class ProductService {
     ));
 
     public List<ProductResponseDto> getProducts() {
+        List<ProductEntity> products = productRepository.findAll();
         return products.stream().map(product -> ProductMapper.toResponse(product)).collect(Collectors.toList());
     }
 

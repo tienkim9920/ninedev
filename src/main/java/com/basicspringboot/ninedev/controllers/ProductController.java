@@ -31,7 +31,7 @@ public class ProductController {
         Optional<ProductDto> product = productService.getProductById(id);
 
         if (product.isPresent()) {
-            return ResponseEntity.ok(
+            return ResponseEntity.ok (
                     new ResponseDTO(200, true, "Chi tiet san pham", product)
             );
         } else {

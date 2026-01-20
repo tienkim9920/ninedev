@@ -1,9 +1,11 @@
 package com.basicspringboot.ninedev.dto;
 
+import com.basicspringboot.ninedev.entites.ProductEntity;
+
 public class ProductMapper {
 
     // Server response -> client
-    public static ProductResponseDto toResponse(ProductDto product) {
+    public static ProductResponseDto toResponse(ProductEntity product) {
         return new ProductResponseDto(product.getId(), product.getName(), product.getPrice());
     }
 
