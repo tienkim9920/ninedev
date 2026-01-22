@@ -28,9 +28,9 @@ public class ProductController {
 
     @GetMapping("/products/{id}")
     public ResponseEntity<ResponseDTO> getProductById(@PathVariable("id") int id) {
-        Optional<ProductDto> product = productService.getProductById(id);
+        ProductResponseDto product = productService.getProductById(id);
 
-        if (product.isPresent()) {
+        if (product.getId() != -1) {
             return ResponseEntity.ok (
                     new ResponseDTO(200, true, "Chi tiet san pham", product)
             );

@@ -33,8 +33,9 @@ public class ProductService {
         return products.stream().map(product -> ProductMapper.toResponse(product)).collect(Collectors.toList());
     }
 
-    public Optional<ProductDto> getProductById(int id) {
-        return products.stream().filter(p -> p.getId() == id).findFirst();
+    public ProductResponseDto getProductById(int id) {
+        ProductEntity product = productRepository.findById((long) id).orElseThrow(() -> new RuntimeException("Product not found"));
+        return ProductMapper.toResponse(product);
     }
 
     public ProductDto createProduct(ProductRequestDto newProduct) {
