@@ -9,6 +9,14 @@ public class ProductMapper {
         return new ProductResponseDto(product.getId(), product.getName(), product.getPrice());
     }
 
+    public static ProductEntity toEntity(ProductRequestDto request) {
+        ProductEntity product = new ProductEntity();
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setDescription(request.getDescription());
+        return product;
+    }
+
     // Client request -> server
     public static ProductDto toRequest(ProductRequestDto request) {
         ProductDto dto = new ProductDto();

@@ -43,7 +43,7 @@ public class ProductController {
 
     @PostMapping("/products")
     public ResponseEntity<ResponseDTO> createProduct(@Valid @RequestBody ProductRequestDto productDto) {
-        ProductDto productNew = productService.createProduct(productDto);
+        ProductResponseDto productNew = productService.createProduct(productDto);
         return ResponseEntity.ok(
                 new ResponseDTO(200, true, "Tao san pham thanh cong", productNew)
         );
@@ -53,6 +53,15 @@ public class ProductController {
     public ResponseEntity<ResponseDTO> updateProduct(@PathVariable int id, @RequestBody ProductDto productDto) {
         return productService.updateProduct(id, productDto).map(updated -> ResponseEntity.ok(
                 new ResponseDTO(200, true, "Cap nhat san pham thanh cong", updated)
+        )).orElse(ResponseEntity.status(400).body(
+                new ResponseDTO(404, false, "Khong tim thay san pham can cap nhat", null)
+        ));
+    }
+
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<ResponseDTO> deleteProduct(@PathVariable int id) {
+        return productService.deleteProduct(id).map(updated -> ResponseEntity.ok(
+                new ResponseDTO(200, true, "Xoa san pham thanh cong", updated)
         )).orElse(ResponseEntity.status(400).body(
                 new ResponseDTO(404, false, "Khong tim thay san pham can cap nhat", null)
         ));

@@ -29,7 +29,7 @@ public class ProductService {
     ));
 
     public List<ProductResponseDto> getProducts() {
-        List<ProductEntity> products = productRepository.findAll();
+        List<ProductEntity> products = productRepository.findAllNative();
         return products.stream().map(product -> ProductMapper.toResponse(product)).collect(Collectors.toList());
     }
 
@@ -38,25 +38,29 @@ public class ProductService {
         return ProductMapper.toResponse(product);
     }
 
-    public ProductDto createProduct(ProductRequestDto newProduct) {
-        int newId = products.stream().mapToInt(ProductDto::getId).max().orElse(0) + 1;
-        ProductDto dto = ProductMapper.toRequest(newProduct);
-        dto.setId(newId);
-        products.add(dto);
-        return dto;
+    public ProductResponseDto createProduct(ProductRequestDto request) {
+        ProductEntity product = ProductMapper.toEntity(request);
+        ProductEntity savedProduct = productRepository.save(product);
+        return ProductMapper.toResponse(savedProduct);
     }
 
-    public Optional<ProductDto> updateProduct(int id, ProductDto updatedProduct) {
-        for (int i = 0; i < products.size(); i++) {
-            ProductDto existing = products.get(i);
-            if (existing.getId() == id) {
-                existing.setName(updatedProduct.getName());
-                existing.setPrice(updatedProduct.getPrice());
-                existing.setDescription(updatedProduct.getDescription());
-                products.set(i, existing);
-                return Optional.of(existing);
-            }
-        }
-        return Optional.empty();
+    public Optional<ProductResponseDto> updateProduct(int id, ProductDto updatedProduct) {
+        return productRepository.findById((long) id)
+                .map(entity -> {
+                    entity.setName(updatedProduct.getName());
+                    entity.setPrice(updatedProduct.getPrice());
+                    entity.setDescription(updatedProduct.getDescription());
+
+                    ProductEntity saved = productRepository.save(entity);
+                    return ProductMapper.toResponse(saved);
+                });
+    }
+
+    public Optional<ProductResponseDto> deleteProduct(int id) {
+        return productRepository.findById((long) id)
+                .map(entity -> {
+                    productRepository.delete(entity);
+                    return ProductMapper.toResponse(entity);
+                });
     }
 }
