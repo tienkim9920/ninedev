@@ -18,7 +18,6 @@ public class OrderEntity {
     private int id;
     private LocalDateTime created_at;
     private Double total_price;
-    private String user_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
