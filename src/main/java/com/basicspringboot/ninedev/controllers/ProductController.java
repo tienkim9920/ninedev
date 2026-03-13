@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-public class ProductController {
+public class ProductController extends BaseController {
 
     @Autowired
     private ProductService productService;
@@ -21,9 +21,7 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<ResponseDTO> getProducts() {
         List<ProductResponseDto> products = productService.getProducts();
-        return ResponseEntity.ok(
-                new ResponseDTO(200, true, "Danh sach san pham", products)
-        );
+        return success("Danh sach san pham", products);
     }
 
     @GetMapping("/products/{id}")
@@ -31,13 +29,9 @@ public class ProductController {
         ProductResponseDto product = productService.getProductById(id);
 
         if (product.getId() != -1) {
-            return ResponseEntity.ok (
-                    new ResponseDTO(200, true, "Chi tiet san pham", product)
-            );
+            return success("Chi tiet san pham", product);
         } else {
-            return ResponseEntity.status(400).body(
-                    new ResponseDTO(404, false, "Khong tim thay san pham voi id = " + id, null)
-            );
+            return error("Khong tim thay san pham voi id = " + id);
         }
     }
 
