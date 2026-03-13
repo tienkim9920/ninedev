@@ -1,5 +1,6 @@
 package com.basicspringboot.ninedev.security;
 
+import com.basicspringboot.ninedev.dto.ResponseDTO;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -36,8 +38,19 @@ public class JwtFilter implements Filter {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
 
-            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token required");
+            HttpServletResponse res = (HttpServletResponse) response;
+
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.setContentType("application/json");
+
+            ResponseDTO dto = new ResponseDTO(
+                    401,
+                    false,
+                    "Token required",
+                    null
+            );
+
+            res.getWriter().write(new ObjectMapper().writeValueAsString(dto));
             return;
         }
 
@@ -45,8 +58,19 @@ public class JwtFilter implements Filter {
 
         if (!jwtUtil.validateToken(token)) {
 
-            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token invalid");
+            HttpServletResponse res = (HttpServletResponse) response;
+
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.setContentType("application/json");
+
+            ResponseDTO dto = new ResponseDTO(
+                    401,
+                    false,
+                    "Token invalid",
+                    null
+            );
+
+            res.getWriter().write(new ObjectMapper().writeValueAsString(dto));
             return;
         }
 
