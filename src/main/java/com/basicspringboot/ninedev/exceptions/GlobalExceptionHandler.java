@@ -25,14 +25,25 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
     }
-}
 
-//{
-//        "status": 404,
-//        "success": false,
-//        "message": "Validation failed",
-//        "data": {
-//          "name": "Tên sản phẩm không được để trống",
-//          "price": "Giá phải lớn hơn 0"
-//        }
-//}
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ResponseDTO> handleUnauthorized(UnauthorizedException ex) {
+
+        ResponseDTO response = new ResponseDTO(
+                401,
+                false,
+                ex.getMessage(),
+                null
+        );
+
+        return ResponseEntity.status(401).body(response);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ResponseDTO> handleBadRequest(BadRequestException ex) {
+
+        return ResponseEntity.status(400).body(
+                new ResponseDTO(400, false, ex.getMessage(), null)
+        );
+    }
+}

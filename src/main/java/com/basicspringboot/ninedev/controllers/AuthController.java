@@ -3,6 +3,7 @@ package com.basicspringboot.ninedev.controllers;
 import com.basicspringboot.ninedev.dto.LoginRequest;
 import com.basicspringboot.ninedev.dto.ResponseDTO;
 import com.basicspringboot.ninedev.entites.UserEntity;
+import com.basicspringboot.ninedev.exceptions.BadRequestException;
 import com.basicspringboot.ninedev.repositories.UserRepository;
 import com.basicspringboot.ninedev.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,10 @@ public class AuthController {
 
         UserEntity user = userRepository
                 .findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
 
         if (!user.getPassword().equals(request.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new BadRequestException("Wrong password");
         }
 
         String token = jwtUtil.generateToken(user.getUsername());
