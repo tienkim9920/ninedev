@@ -5,6 +5,9 @@
 # Repository
 # Database
 
+./gradlew bootRun
+./gradlew clean build
+
 @Query(value = """
 SELECT o.*
 FROM orders o
