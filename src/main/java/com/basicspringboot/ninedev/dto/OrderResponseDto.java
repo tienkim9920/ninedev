@@ -13,5 +13,5 @@ public class OrderResponseDto {
     private int id;
     private String created_at;
     private double total_price;
-    private int user_id;
+    private UserDto user;
 }

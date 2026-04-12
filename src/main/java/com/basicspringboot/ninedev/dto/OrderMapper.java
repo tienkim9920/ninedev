@@ -9,7 +9,13 @@ public class OrderMapper {
         dto.setId(order.getId());
         dto.setCreated_at(order.getCreated_at());
         dto.setTotal_price(order.getTotal_price());
-        dto.setUser_id(order.getUser().getId());
+        
+        UserDto user = new UserDto();
+        user.setId(order.getUser().getId());
+        user.setEmail(order.getUser().getEmail());
+        user.setUsername(order.getUser().getUsername());
+        
+        dto.setUser(user);
         return dto;
     }
 }
