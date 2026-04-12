@@ -1,23 +1,34 @@
 # ninedev
+
 # Client
+
 # Controller
+
 # Service
+
 # Repository
+
 # Database
 
-@Query(value = """
-SELECT o.*
-FROM orders o
-LEFT JOIN users u
-ON o.user_id = u.id
-""", nativeQuery = true)
-List<Order> findOrdersNative();
 
-    // helper method (best practice)
-    public void addOrder(Order order) {
-        orders.add(order);
-        order.setUser(this);
-    }
+@Getter
+@Setter
+@NoArgsConstructor
+public class OrderRequestDto {
+    private String createdAt;
+
+    @NotNull(message = "Gia san pham khong duoc de trong")
+    private double totalPrice;
+
+    @NotNull(message = "user_id khong duoc de trong")
+    private Long userId;
+}
+
+// helper method (best practice)
+public void addOrder(OrderEntity order) {
+    orders.add(order);
+    order.setUser(this);
+}
 
 @Service
 @RequiredArgsConstructor
@@ -27,35 +38,26 @@ public class OrderService {
     private final OrderRepository orderRepo;
 
     @Transactional
-    public Order createOrder(Long userId, Double price) {
+    public boolean createOrder(OrderRequestDto orderRequestDto) {
+        UserEntity user = userRepository.findById(orderRequestDto.getUser_id()).orElseThrow();
 
-        User user = userRepo.findById(userId)
-                .orElseThrow();
+        OrderEntity order = new OrderEntity();
+        order.setTotal_price(orderRequestDto.getTotalPrice());
 
-        Order order = new Order();
-        order.setCreatedAt(LocalDateTime.now());
-        order.setTotalPrice(price);
+        user.addOrder(order);
+        orderRepository.save(order);
 
-        user.addOrder(order); // helper sync 2 chiều
-
-        return orderRepo.save(order);
+        return true;
     }
+
 }
 
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/orders")
-public class OrderController {
-
-    private final OrderService service;
-
-    @PostMapping("/{userId}")
-    public Order create(
-            @PathVariable Long userId,
-            @RequestParam Double price) {
-
-        return service.createOrder(userId, price);
-    }
+@PostMapping("/orders")
+public ResponseEntity<ResponseDTO> createOrder(@Valid @RequestBody OrderRequestDto orderRequestDto) {
+    boolean isCreate = orderService.createOrder(orderRequestDto);
+    return ResponseEntity.ok(
+            new ResponseDTO(200, true, "Tao don hang thanh cong", isCreate)
+    );
 }
 
 ❌ Spring không auto link
