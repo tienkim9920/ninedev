@@ -8,8 +8,6 @@ import com.basicspringboot.ninedev.entites.ProductEntity;
 import com.basicspringboot.ninedev.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,12 +19,6 @@ public class ProductService {
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
-
-    private static final List<ProductDto> products = new ArrayList<>(Arrays.asList(
-            new ProductDto(1, "Laptop Asus", 100000, "Laptop gaming"),
-            new ProductDto(2, "Laptop HP", 200000, "Laptop van phong"),
-            new ProductDto(3, "Iphone 15", 300000, "Dien thoai cua apple")
-    ));
 
     public List<ProductResponseDto> getProducts() {
         List<ProductEntity> products = productRepository.findAllNative();
