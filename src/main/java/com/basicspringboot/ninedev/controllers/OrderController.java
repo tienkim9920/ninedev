@@ -1,5 +1,6 @@
 package com.basicspringboot.ninedev.controllers;
 
+import com.basicspringboot.ninedev.dto.OrderRequestDto;
 import com.basicspringboot.ninedev.dto.OrderResponseDto;
 import com.basicspringboot.ninedev.dto.ResponseDTO;
 import com.basicspringboot.ninedev.services.OrderService;
@@ -19,7 +20,13 @@ public class OrderController {
     public ResponseEntity<ResponseDTO> getOrders() {
         List<OrderResponseDto> orders = orderService.getOrders();
         return ResponseEntity.ok(
-                new ResponseDTO(200, true, "Danh sach don hang", orders)
-        );
+                new ResponseDTO(200, true, "Danh sach don hang", orders));
+    }
+
+    @PostMapping("create-order")
+    public ResponseEntity<ResponseDTO> createOrder(@RequestBody OrderRequestDto orderRequestDto) {
+        boolean order = orderService.createOrder(orderRequestDto);
+        return ResponseEntity.ok(
+                new ResponseDTO(200, true, "Don hang da duoc tao thanh cong", order));
     }
 }
