@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             WHERE u.id = :id
             """)
     Optional<UserEntity> findByIdWithOrders(@Param("id") int id);
+
+    Optional<UserEntity> findByEmail(String email);
 }
