@@ -3,6 +3,8 @@ package com.basicspringboot.ninedev.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +34,16 @@ public class AuthController {
                     .body(new ResponseDTO(401, false, "Invalid password", null));
         }
 
-        String token = jwtUtils.generateToken(user.getEmail());
+        String token = jwtUtils.generateToken(user.getEmail(), user.getRole());
         return ResponseEntity.ok(new ResponseDTO(200, true, "Login Success", token));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ResponseDTO> getProfile(Authentication authentication) {
+        String username = authentication.getName();
+        String role = authentication.getAuthorities().toString();
+        String result = "{username: " + username + ", role: " + role + "}";
+
+        return ResponseEntity.ok(new ResponseDTO(200, true, "Profile", result));
     }
 }
