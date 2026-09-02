@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,9 +12,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import com.basicspringboot.ninedev.dto.ResponseDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.basicspringboot.ninedev.exceptions.UnauthorizedException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,9 +25,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
+    private final HandlerExceptionResolver exceptionResolver;
 
-    public JwtFilter(JwtUtils jwtUtils) {
+    public JwtFilter(JwtUtils jwtUtils, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
         this.jwtUtils = jwtUtils;
+        this.exceptionResolver = exceptionResolver;
     }
 
     @Override
@@ -35,10 +38,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
-        if (StringUtils.hasText(authHeader) && StringUtils.startsWithIgnoreCase(authHeader, "Bearer ")) {
-            String token = authHeader.substring(7);
+        try {
+            if (StringUtils.hasText(authHeader) && StringUtils.startsWithIgnoreCase(authHeader, "Bearer ")) {
+                String token = authHeader.substring(7);
 
-            try {
                 if (jwtUtils.isTokenValid(token)) {
                     String username = jwtUtils.extractUsername(token);
                     String role = jwtUtils.extractRole(token);
@@ -55,30 +58,15 @@ public class JwtFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                } else {
-                    HttpServletResponse res = (HttpServletResponse) response;
-                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    res.setContentType("application/json");
+                } else
+                    throw new UnauthorizedException("Token Invalid");
+            } else
+                throw new UnauthorizedException("Token required");
 
-                    ResponseDTO dto = new ResponseDTO(
-                            401, false, "Token invalid", null);
-                    res.getWriter().write(new ObjectMapper().writeValueAsString(dto));
-                    return;
-                }
-            } catch (Exception e) {
-                SecurityContextHolder.clearContext();
-            }
-        } else {
-            HttpServletResponse res = (HttpServletResponse) response;
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.setContentType("application/json");
-
-            ResponseDTO dto = new ResponseDTO(
-                    401, false, "Token required", null);
-            res.getWriter().write(new ObjectMapper().writeValueAsString(dto));
-            return;
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+            exceptionResolver.resolveException(request, response, null, e);
         }
-
-        filterChain.doFilter(request, response);
     }
 }
