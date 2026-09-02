@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.basicspringboot.ninedev.dto.ResponseDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,10 +55,28 @@ public class JwtFilter extends OncePerRequestFilter {
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    HttpServletResponse res = (HttpServletResponse) response;
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setContentType("application/json");
+
+                    ResponseDTO dto = new ResponseDTO(
+                            401, false, "Token invalid", null);
+                    res.getWriter().write(new ObjectMapper().writeValueAsString(dto));
+                    return;
                 }
             } catch (Exception e) {
                 SecurityContextHolder.clearContext();
             }
+        } else {
+            HttpServletResponse res = (HttpServletResponse) response;
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.setContentType("application/json");
+
+            ResponseDTO dto = new ResponseDTO(
+                    401, false, "Token required", null);
+            res.getWriter().write(new ObjectMapper().writeValueAsString(dto));
+            return;
         }
 
         filterChain.doFilter(request, response);
