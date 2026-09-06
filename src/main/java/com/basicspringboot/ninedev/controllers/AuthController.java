@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.basicspringboot.ninedev.bases.BaseController;
 import com.basicspringboot.ninedev.dto.LoginRequestDto;
 import com.basicspringboot.ninedev.dto.ResponseDTO;
 import com.basicspringboot.ninedev.entites.UserEntity;
@@ -18,10 +19,11 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController extends BaseController {
 
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
+    
 
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDto request) {
@@ -29,12 +31,11 @@ public class AuthController {
 
         // Kiem tra password
         if (!user.getPassword().equals(request.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseDTO(401, false, "Invalid password", null));
+            error("Invalid password");
         }
 
         String token = jwtUtils.generateToken(user.getEmail(), user.getRole());
-        return ResponseEntity.ok(new ResponseDTO(200, true, "Login Success", token));
+        return success("Login Success", token);
     }
 
     @GetMapping("/profile")

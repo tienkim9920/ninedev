@@ -27,7 +27,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final HandlerExceptionResolver exceptionResolver;
 
-    public JwtFilter(JwtUtils jwtUtils, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
+    public JwtFilter(JwtUtils jwtUtils,
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver exceptionResolver) {
         this.jwtUtils = jwtUtils;
         this.exceptionResolver = exceptionResolver;
     }
@@ -37,6 +38,12 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
+
+        String path = request.getRequestURI();
+        if (path.startsWith(("/login"))) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             if (StringUtils.hasText(authHeader) && StringUtils.startsWithIgnoreCase(authHeader, "Bearer ")) {
