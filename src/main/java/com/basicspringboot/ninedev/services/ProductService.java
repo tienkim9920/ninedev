@@ -4,8 +4,14 @@ import com.basicspringboot.ninedev.dto.ProductDto;
 import com.basicspringboot.ninedev.dto.ProductMapper;
 import com.basicspringboot.ninedev.dto.ProductRequestDto;
 import com.basicspringboot.ninedev.dto.ProductResponseDto;
+import com.basicspringboot.ninedev.dto.ProductResponseResult;
 import com.basicspringboot.ninedev.entites.ProductEntity;
 import com.basicspringboot.ninedev.repositories.ProductRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,9 +26,14 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<ProductResponseDto> getProducts() {
-        List<ProductEntity> products = productRepository.findAllNative();
-        return products.stream().map(product -> ProductMapper.toResponse(product)).collect(Collectors.toList());
+    public ProductResponseResult getProducts(String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<ProductEntity> results = productRepository.findAllNative(name, pageable);
+
+        List<ProductEntity> products = results.getContent();
+        long totalElements = results.getTotalElements();
+        int totalPages = results.getTotalPages();
+        return new ProductResponseResult(totalElements, totalPages, products.stream().map(ProductMapper::toResponse).collect(Collectors.toList()));
     }
 
     public ProductResponseDto getProductById(int id) {

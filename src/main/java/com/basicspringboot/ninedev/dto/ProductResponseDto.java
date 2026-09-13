@@ -20,3 +20,5 @@ public class ProductResponseDto {
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
 }
+
+

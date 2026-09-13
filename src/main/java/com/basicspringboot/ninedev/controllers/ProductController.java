@@ -1,16 +1,24 @@
 package com.basicspringboot.ninedev.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.basicspringboot.ninedev.dto.ProductDto;
 import com.basicspringboot.ninedev.dto.ProductRequestDto;
 import com.basicspringboot.ninedev.dto.ProductResponseDto;
+import com.basicspringboot.ninedev.dto.ProductResponseResult;
 import com.basicspringboot.ninedev.dto.ResponseDTO;
 import com.basicspringboot.ninedev.services.ProductService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import jakarta.validation.Valid;
 
 @RestController
 public class ProductController {
@@ -19,10 +27,12 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<ResponseDTO> getProducts() {
-        List<ProductResponseDto> products = productService.getProducts();
+    public ResponseEntity<ResponseDTO> getProducts(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                @RequestParam(value = "size", defaultValue = "10") int size,
+                                            @RequestParam(value = "name", defaultValue = "") String name) {
+        ProductResponseResult productResult = productService.getProducts(name, page, size);
         return ResponseEntity.ok(
-                new ResponseDTO(200, true, "Danh sach san pham", products)
+                new ResponseDTO(200, true, "Danh sach san pham", productResult)
         );
     }
 

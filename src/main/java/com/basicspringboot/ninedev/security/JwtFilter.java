@@ -40,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         String path = request.getRequestURI();
-        if (path.startsWith(("/login"))) {
+        if (path.startsWith(("/products"))) {
             filterChain.doFilter(request, response);
             return;
         }
