@@ -14,6 +14,7 @@ public class ProductMapper {
         product.setName(request.getName());
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
+        product.setIsdelete(false);
         return product;
     }
 
@@ -23,6 +24,7 @@ public class ProductMapper {
         dto.setName(request.getName());
         dto.setPrice(request.getPrice());
         dto.setDescription(request.getDescription());
+        dto.setIsdelete(false);
         return dto;
     }
 }

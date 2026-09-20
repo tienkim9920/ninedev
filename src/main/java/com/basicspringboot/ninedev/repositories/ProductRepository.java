@@ -12,9 +12,11 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Query(value = """
             SELECT * FROM product
             WHERE (:name IS NULL OR name LIKE CONCAT('%', :name, '%'))
+            AND isdelete = false
             """, countQuery = """
             SELECT COUNT(*) FROM product
             WHERE (:name IS NULL OR name LIKE CONCAT('%', :name, '%'))
+            AND isdelete = false
             """, nativeQuery = true)
     Page<ProductEntity> findAllNative(@Param("name") String name, Pageable pageable);
 }

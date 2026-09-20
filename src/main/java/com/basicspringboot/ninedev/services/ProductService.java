@@ -33,11 +33,13 @@ public class ProductService {
         List<ProductEntity> products = results.getContent();
         long totalElements = results.getTotalElements();
         int totalPages = results.getTotalPages();
-        return new ProductResponseResult(totalElements, totalPages, products.stream().map(ProductMapper::toResponse).collect(Collectors.toList()));
+        return new ProductResponseResult(totalElements, totalPages,
+                products.stream().map(ProductMapper::toResponse).collect(Collectors.toList()));
     }
 
     public ProductResponseDto getProductById(int id) {
-        ProductEntity product = productRepository.findById((long) id).orElseThrow(() -> new RuntimeException("Product not found"));
+        ProductEntity product = productRepository.findById((long) id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
         return ProductMapper.toResponse(product);
     }
 
@@ -62,8 +64,9 @@ public class ProductService {
     public Optional<ProductResponseDto> deleteProduct(int id) {
         return productRepository.findById((long) id)
                 .map(entity -> {
-                    productRepository.delete(entity);
-                    return ProductMapper.toResponse(entity);
+                    entity.setIsdelete(true);
+                    ProductEntity saved = productRepository.save(entity);
+                    return ProductMapper.toResponse(saved);
                 });
     }
 }
