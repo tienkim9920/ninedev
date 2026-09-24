@@ -8,6 +8,8 @@ import com.basicspringboot.ninedev.dto.ProductResponseResult;
 import com.basicspringboot.ninedev.entites.ProductEntity;
 import com.basicspringboot.ninedev.repositories.ProductRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j 
 public class ProductService {
     private final ProductRepository productRepository;
 
@@ -27,6 +30,7 @@ public class ProductService {
     }
 
     public ProductResponseResult getProducts(String name, int page, int size) {
+        log.info("[SERVICE] getProducts: {} - {} - {}", name, page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<ProductEntity> results = productRepository.findAllNative(name, pageable);
 

@@ -1,0 +1,6 @@
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [traceId=%X{traceId:-NA},spanId=%X{spanId:-NA}] [%t] %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.basicspringboot.ninedev: DEBUG

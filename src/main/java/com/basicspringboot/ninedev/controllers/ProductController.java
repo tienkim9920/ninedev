@@ -19,8 +19,10 @@ import com.basicspringboot.ninedev.dto.ResponseDTO;
 import com.basicspringboot.ninedev.services.ProductService;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@Slf4j
 public class ProductController {
 
     @Autowired
@@ -28,26 +30,24 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<ResponseDTO> getProducts(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                @RequestParam(value = "size", defaultValue = "10") int size,
-                                            @RequestParam(value = "name", defaultValue = "") String name) {
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "name", defaultValue = "") String name) {
         ProductResponseResult productResult = productService.getProducts(name, page, size);
+        log.info("[CONTROLLER] Processing products: {}", productResult);
         return ResponseEntity.ok(
-                new ResponseDTO(200, true, "Danh sach san pham", productResult)
-        );
+                new ResponseDTO(200, true, "Danh sach san pham", productResult));
     }
 
     @GetMapping("/products/{id}")
     public ResponseEntity<ResponseDTO> getProductById(@PathVariable("id") int id) {
         ProductResponseDto product = productService.getProductById(id);
-
+        log.info("[CONTROLLER] Product detail: {}", product.getId());
         if (product.getId() != -1) {
-            return ResponseEntity.ok (
-                    new ResponseDTO(200, true, "Chi tiet san pham", product)
-            );
+            return ResponseEntity.ok(
+                    new ResponseDTO(200, true, "Chi tiet san pham", product));
         } else {
             return ResponseEntity.status(400).body(
-                    new ResponseDTO(404, false, "Khong tim thay san pham voi id = " + id, null)
-            );
+                    new ResponseDTO(404, false, "Khong tim thay san pham voi id = " + id, null));
         }
     }
 
@@ -55,32 +55,27 @@ public class ProductController {
     public ResponseEntity<ResponseDTO> createProduct(@Valid @RequestBody ProductRequestDto productDto) {
         ProductResponseDto productNew = productService.createProduct(productDto);
         return ResponseEntity.ok(
-                new ResponseDTO(200, true, "Tao san pham thanh cong", productNew)
-        );
+                new ResponseDTO(200, true, "Tao san pham thanh cong", productNew));
     }
 
     @PutMapping("/products/{id}")
     public ResponseEntity<ResponseDTO> updateProduct(@PathVariable int id, @RequestBody ProductDto productDto) {
         return productService.updateProduct(id, productDto).map(updated -> ResponseEntity.ok(
-                new ResponseDTO(200, true, "Cap nhat san pham thanh cong", updated)
-        )).orElse(ResponseEntity.status(400).body(
-                new ResponseDTO(404, false, "Khong tim thay san pham can cap nhat", null)
-        ));
+                new ResponseDTO(200, true, "Cap nhat san pham thanh cong", updated)))
+                .orElse(ResponseEntity.status(400).body(
+                        new ResponseDTO(404, false, "Khong tim thay san pham can cap nhat", null)));
     }
 
     @DeleteMapping("/products/{id}")
     public ResponseEntity<ResponseDTO> deleteProduct(@PathVariable int id) {
         return productService.deleteProduct(id).map(updated -> ResponseEntity.ok(
-                new ResponseDTO(200, true, "Xoa san pham thanh cong", updated)
-        )).orElse(ResponseEntity.status(400).body(
-                new ResponseDTO(404, false, "Khong tim thay san pham can cap nhat", null)
-        ));
+                new ResponseDTO(200, true, "Xoa san pham thanh cong", updated))).orElse(ResponseEntity.status(400).body(
+                        new ResponseDTO(404, false, "Khong tim thay san pham can cap nhat", null)));
     }
 
     @GetMapping("/products/search")
     public ResponseEntity<ResponseDTO> searchProduct(@RequestParam("name") String name) {
         return ResponseEntity.ok(
-                new ResponseDTO(200, true, "Ket qua tim kiem", "Tim thay san pham: " + name)
-        );
+                new ResponseDTO(200, true, "Ket qua tim kiem", "Tim thay san pham: " + name));
     }
 }
