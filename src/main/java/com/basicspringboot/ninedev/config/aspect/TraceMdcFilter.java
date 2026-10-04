@@ -42,9 +42,7 @@ public class TraceMdcFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } finally {
-            // Luôn dọn dẹp MDC để tránh memory leak và nhiễm trace sang thread khác
-            MDC.remove(TRACE_ID);
-            MDC.remove(SPAN_ID);
+            MDC.clear();
         }
     }
 }
