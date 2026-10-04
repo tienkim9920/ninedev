@@ -1,0 +1,50 @@
+package com.basicspringboot.ninedev.config.aspect;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.MDC;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.UUID;
+
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class TraceMdcFilter extends OncePerRequestFilter {
+
+    private static final String TRACE_ID = "traceId";
+    private static final String SPAN_ID = "spanId";
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+        try {
+            // Lấy traceId từ header nếu có (Client/Gateway truyền xuống) hoặc tự tạo mới
+            String traceId = request.getHeader("X-Trace-Id");
+            if (traceId == null || traceId.isBlank()) {
+                traceId = UUID.randomUUID().toString().replace("-", "");
+            }
+
+            // Sinh spanId cho request hiện tại
+            String spanId = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+
+            MDC.put(TRACE_ID, traceId);
+            MDC.put(SPAN_ID, spanId);
+
+            // Gắn lại vào response header để client tiện đối soát nếu có lỗi
+            response.setHeader("X-Trace-Id", traceId);
+
+            filterChain.doFilter(request, response);
+        } finally {
+            // Luôn dọn dẹp MDC để tránh memory leak và nhiễm trace sang thread khác
+            MDC.remove(TRACE_ID);
+            MDC.remove(SPAN_ID);
+        }
+    }
+}
